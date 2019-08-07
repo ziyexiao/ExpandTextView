@@ -13,11 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-/**
- * Created by 43844 on 2019/8/2.
- *
- */
-
 public class ExpandTextView extends LinearLayout {
 
     //折叠状态, true为折叠, false为展开
@@ -106,6 +101,9 @@ public class ExpandTextView extends LinearLayout {
     }
 
     private void init(final Context context) {
+
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        setLayoutParams(params);
         setOrientation(VERTICAL);
 
         //内容显示文本
@@ -114,6 +112,7 @@ public class ExpandTextView extends LinearLayout {
         mTextView.setTextSize(textSize);
         mTextView.setTextColor(textColor);
         mTextView.setEllipsize(TextUtils.TruncateAt.END);
+        mTextView.setLayoutParams(params);
 
         addView(mTextView);
 
@@ -329,6 +328,9 @@ public class ExpandTextView extends LinearLayout {
 
     public ExpandTextView setBtnGravity(int btnGravity) {
         this.btnGravity = btnGravity;
+        LayoutParams paramsLlBtn = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        paramsLlBtn.gravity = btnGravity;
+        mLlBtn.setLayoutParams(paramsLlBtn);
         return this;
     }
 

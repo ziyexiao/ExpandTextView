@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
     <declare-styleable name="ExpandTextView">
+        <!--内容文本颜色-->
         <attr name="contentTextColor" format="reference|color"/>
+        <!--内容文本字体大小-->
         <attr name="contentTextSize" format="dimension"/>
+        <!--按钮文本颜色-->
         <attr name="btnTextColor" format="reference|color"/>
+        <!--按钮折叠的描述-->
         <attr name="btnExpandText" format="string"/>
+        <!--按钮展开的描述-->
         <attr name="btnSpreadText" format="string"/>
+        <!--按钮字体大小-->
         <attr name="btnTextSize" format="dimension"/>
+        <!--最大显示行数-->
         <attr name="showLines" format="integer"/>
+        <!--是否显示箭头图标-->
         <attr name="showIcon" format="boolean"/>
+        <!--箭头资源-->
         <attr name="iconRes" format="reference"/>
+        <!--动画时长-->
         <attr name="animationDuration" format="integer"/>
-
     </declare-styleable>
 </resources>
