@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <declare-styleable name="ExpandTextView">
+        <attr name="contentTextColor" format="reference|color"/>
+        <attr name="contentTextSize" format="dimension"/>
+        <attr name="btnTextColor" format="reference|color"/>
+        <attr name="btnExpandText" format="string"/>
+        <attr name="btnSpreadText" format="string"/>
+        <attr name="btnTextSize" format="dimension"/>
+        <attr name="showLines" format="integer"/>
+        <attr name="showIcon" format="boolean"/>
+        <attr name="iconRes" format="reference"/>
+        <attr name="animationDuration" format="integer"/>
+
+    </declare-styleable>
+</resources>
