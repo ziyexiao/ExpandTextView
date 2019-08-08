@@ -1,7 +1,73 @@
 # ExpandTextView
 可折叠展开的TextView---ExpandTextView
 
-[点击查看gif效果图](http://m.qpic.cn/psb?/V14Ej48r2rOT1E/KsC6T0q5YFNAbNSRFXfjYF.WLUKFHIlM99elDehqHE4!/c/dL8AAAAAAAAA&bo=aAGAAgAAAAACB8g!&rf=viewer_4)
+[![](https://jitpack.io/v/ziyexiao/ExpandTextView.svg)](https://jitpack.io/#ziyexiao/ExpandTextView)
+
+[点击查看gif效果图](https://img-blog.csdnimg.cn/20190808104936409.gif)
+
+## 简单使用
+* Step 1. 添加如下代码至project的build.gradle里:
+
+	    allprojects {
+	    	repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		    }
+	    }
+	
+* Step 2. 添加依赖
+
+	   dependencies {
+       	        implementation 'com.github.ziyexiao:ExpandTextView:1.0.1'
+       	}
+	    
+* step 3.在XML布局文件中添加 RoundProgressBar
+
+            <com.xx.expandtextview.ExpandTextView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/etv_main" />
+                    
+* step 4.添加代码
+
+        ExpandTextView etvMain = findViewById(R.id.etv_main);
+         
+                etvMain.setText(desc)
+                        .setExpandEnable(true)  //是否可折叠, 默认为true
+                        .setTextColor(Color.GRAY)       //内容文本颜色
+                        .setTextSize(14)        //文本字体大小
+                        .setAnimationDuration(500)  //动画执行时长
+                        .setBtnExpandText("点击收起")   //折叠文字
+                        .setBtnSpreadText("点击展开")       //展开文字
+                        .setBtnGravity(Gravity.END)     //按钮位置
+                        .setBtnTextColor(Color.BLACK)     //按钮文本颜色
+                        .setBtnTextSize(18)            //按钮文本大小
+                        .setShowIcon(true)  //显示箭头
+                        .setSpanClickable(true, new ExpandTextView.TextSpanClickListener() {  //设置有标签或@某人的点击, 默认为false
+                            @Override
+                            public void onTextSpanClick(String data) {
+                                try {
+                                    JSONObject jsonObject = new JSONObject(data);
+                                    int type = jsonObject.getInt("type");
+                                    String desc = jsonObject.getString("desc");
+         
+         
+                                    Intent intent = new Intent();
+                                    switch (type) {
+                                        case 0:      //个人主页
+                                            intent.setClass(MainActivity.this, UserCenterActivity.class);
+                                            break;
+                                        case 1:      //话题主页
+                                            intent.setClass(MainActivity.this, TopicCenterActivity.class);
+                                            break;
+                                    }
+                                    intent.putExtra("desc", desc);
+                                    startActivity(intent);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
 
 ## 自定义属性说明
 

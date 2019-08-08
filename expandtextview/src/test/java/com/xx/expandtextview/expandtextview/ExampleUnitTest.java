@@ -1,4 +1,4 @@
-package com.expand.demo.expandtextview;
+package com.xx.expandtextview.expandtextview;
 
 import org.junit.Test;
 

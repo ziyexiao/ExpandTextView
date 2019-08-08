@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.expand.demo.MainActivity">
+    tools:context="com.xx.expandtextview.MainActivity">
 
-    <com.expand.demo.expandtextview.ExpandTextView
+    <com.xx.expandtextview.ExpandTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/etv_main" />

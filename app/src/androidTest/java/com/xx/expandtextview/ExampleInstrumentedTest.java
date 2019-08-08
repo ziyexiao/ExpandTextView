@@ -1,4 +1,4 @@
-package com.expand.demo;
+package com.xx.expandtextview;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

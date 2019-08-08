@@ -1,13 +1,10 @@
-package com.expand.demo;
+package com.xx.expandtextview;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.widget.Toast;
-
-import com.expand.demo.expandtextview.ExpandTextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;

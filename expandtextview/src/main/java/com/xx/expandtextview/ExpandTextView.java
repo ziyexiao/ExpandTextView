@@ -1,4 +1,4 @@
-package com.expand.demo.expandtextview;
+package com.xx.expandtextview;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.xx.expandtextview.expandtextview.R;
 
 public class ExpandTextView extends LinearLayout {
 
