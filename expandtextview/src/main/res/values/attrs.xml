@@ -21,5 +21,9 @@
         <attr name="iconRes" format="reference"/>
         <!--动画时长-->
         <attr name="animationDuration" format="integer"/>
+        <!--@或者#话题#是否自定义点击事件-->
+        <attr name="spanClickable" format="boolean"/>
+        <!--是否可折叠-->
+        <attr name="expandEnable" format="boolean"/>
     </declare-styleable>
 </resources>

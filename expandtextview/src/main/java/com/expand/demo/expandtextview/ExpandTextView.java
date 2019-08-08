@@ -4,7 +4,16 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -20,6 +29,10 @@ public class ExpandTextView extends LinearLayout {
 
     //文本内容
     private String text;
+
+    //是否可折叠
+    private boolean expandEnable;
+
     //文本颜色
     private int textColor;
     //字体大小
@@ -57,9 +70,21 @@ public class ExpandTextView extends LinearLayout {
     //按钮位置
     private int btnGravity = Gravity.CENTER;
 
+
+    //true, 表示拦截标签span点击事件
+    //false, 表示普通文本
+    private boolean spanClickable;
+
     private ImageView mIvArrow;
 
     private LinearLayout mLlBtn;
+
+    //spanString点击的回调
+    public interface TextSpanClickListener {
+        void onTextSpanClick(String data);
+    }
+
+    private TextSpanClickListener mTextSpanClick;
 
     public ExpandTextView(Context context) {
         this(context, null);
@@ -88,6 +113,10 @@ public class ExpandTextView extends LinearLayout {
 
         mAnimationDuration = typedArray.getInt(R.styleable.ExpandTextView_animationDuration, 250);
 
+        spanClickable = typedArray.getBoolean(R.styleable.ExpandTextView_spanClickable, false);
+
+        expandEnable = typedArray.getBoolean(R.styleable.ExpandTextView_expandEnable, true);
+
         if (TextUtils.isEmpty(btnExpandText)) {
             btnExpandText = "收起";
         }
@@ -101,18 +130,22 @@ public class ExpandTextView extends LinearLayout {
     }
 
     private void init(final Context context) {
-
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         setLayoutParams(params);
         setOrientation(VERTICAL);
 
         //内容显示文本
         mTextView = new TextView(context);
-        mTextView.setText(text);
+//        mTextView.setText(text);
         mTextView.setTextSize(textSize);
         mTextView.setTextColor(textColor);
         mTextView.setEllipsize(TextUtils.TruncateAt.END);
         mTextView.setLayoutParams(params);
+
+        //根据SpanClickable状态来设置文本
+        setTextBySpanClickableStatus();
+
+        mTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
         addView(mTextView);
 
@@ -123,7 +156,6 @@ public class ExpandTextView extends LinearLayout {
         paramsLlBtn.gravity = btnGravity;
         mLlBtn.setLayoutParams(paramsLlBtn);
         mLlBtn.setPadding(15, 15, 15, 15);
-
 
         //按钮图标
         LayoutParams paramsImg = new LayoutParams(dip2px(context, 20), dip2px(context, 20));
@@ -141,7 +173,6 @@ public class ExpandTextView extends LinearLayout {
         mBtnText.setText(btnSpreadText);
         mBtnText.setTextSize(btnTextSize);
         mLlBtn.addView(mBtnText);
-
 
         mLlBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -250,14 +281,14 @@ public class ExpandTextView extends LinearLayout {
             //文本显示行数大于折叠行数, 显示按钮, 否则隐藏
             mLlBtn.setVisibility(mTextView.getLineCount() > showLines ? VISIBLE : GONE);
 
-
             //测量后再设置显示行数
-            mTextView.setMaxLines(showLines);
+            if (expandEnable) {
+                mTextView.setMaxLines(showLines);
+            }
 
             canMeasure = false;
         }
     }
-
 
     /**
      * 将dip或dp值转换为px值，保证尺寸大小不变
@@ -267,13 +298,21 @@ public class ExpandTextView extends LinearLayout {
         return (int) (dipValue * scale + 0.5f);
     }
 
-
     public ExpandTextView setText(String text) {
         this.text = text;
-        mTextView.setText(text);
+
+        setTextBySpanClickableStatus();
+
         return this;
     }
 
+    public ExpandTextView setExpandEnable(boolean expandEnable) {
+        this.expandEnable = expandEnable;
+        if (!expandEnable) {
+            removeView(mLlBtn);
+        }
+        return this;
+    }
 
     public ExpandTextView setTextColor(int textColor) {
         this.textColor = textColor;
@@ -281,9 +320,9 @@ public class ExpandTextView extends LinearLayout {
         return this;
     }
 
-
     public ExpandTextView setTextSize(float textSize) {
         this.textSize = textSize;
+
         mTextView.setTextSize(textSize);
         return this;
     }
@@ -314,15 +353,8 @@ public class ExpandTextView extends LinearLayout {
         return this;
     }
 
-
     public ExpandTextView setAnimationDuration(long animationDuration) {
         mAnimationDuration = animationDuration;
-        return this;
-    }
-
-
-    public ExpandTextView setExpand(boolean expand) {
-        this.expand = expand;
         return this;
     }
 
@@ -334,10 +366,72 @@ public class ExpandTextView extends LinearLayout {
         return this;
     }
 
-
     public ExpandTextView setShowIcon(boolean showIcon) {
         this.showIcon = showIcon;
         return this;
     }
 
+    public ExpandTextView setSpanClickable(boolean spanClickable, TextSpanClickListener textSpanClick) {
+        this.spanClickable = spanClickable;
+        mTextSpanClick = textSpanClick;
+
+        setTextBySpanClickableStatus();
+        return this;
+    }
+
+    /**
+     * 格式化超链接文本内容并设置点击处理
+     */
+    private CharSequence getClickableHtml(String html) {
+        Spanned spannedHtml = Html.fromHtml(html);
+
+        SpannableStringBuilder clickableHtmlBuilder = new SpannableStringBuilder(spannedHtml);
+        URLSpan[] urls = clickableHtmlBuilder.getSpans(0, spannedHtml.length(), URLSpan.class);
+        for (final URLSpan span : urls) {
+            setLinkClickable(clickableHtmlBuilder, span);
+        }
+        return clickableHtmlBuilder;
+    }
+
+    /**
+     * 设置点击超链接对应的处理内容
+     */
+    private void setLinkClickable(final SpannableStringBuilder clickableHtmlBuilder, final URLSpan urlSpan) {
+        int start = clickableHtmlBuilder.getSpanStart(urlSpan);
+        int end = clickableHtmlBuilder.getSpanEnd(urlSpan);
+        int flags = clickableHtmlBuilder.getSpanFlags(urlSpan);
+
+        clickableHtmlBuilder.setSpan(new ClickableSpan() {
+            public void onClick(View view) {
+                if (mTextSpanClick != null) {
+                    //取出a标签的href携带的数据, 并回调到调用处
+                    //href的数据类型根据个人业务来定, demo是传的json字符串
+                    mTextSpanClick.onTextSpanClick(urlSpan.getURL());
+                }
+            }
+
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.linkColor = Color.TRANSPARENT;
+                ds.setColor(Color.BLUE);
+                ds.setUnderlineText(false);
+            }
+        }, start, end, flags);
+    }
+
+
+    /**
+     * 根据SpanClickable的状态来设置文本
+     */
+    private void setTextBySpanClickableStatus() {
+        if (!TextUtils.isEmpty(text)) {
+            if (spanClickable) {
+                mTextView.setAutoLinkMask(Linkify.ALL);
+                mTextView.setText(getClickableHtml(text));
+            } else {
+                mTextView.setText(text);
+            }
+        }
+    }
 }
